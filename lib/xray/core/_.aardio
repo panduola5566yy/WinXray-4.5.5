@@ -32,8 +32,8 @@ isInboundPortChanged = function(){
 
 var prcsxray,xrayStarting;
 import process.job.limitKill;
+// 重启xray
 restart = function(editor,outbound){
-	
     if(!outbound){ return null,"错误的出站代理服务器配置"  }
     if(_WINXP){
     	return null,"抱歉！Xray Core 不支持 Windows XP, 仅支持 Windows 7, Windows 10 以及更新操作系统。";  
@@ -49,6 +49,7 @@ restart = function(editor,outbound){
 
 	if(xrayStarting){ return null,"不能重复启动 Xray Core"  } 
 	xrayStarting = true;
+	
 	
 	var corePath = getPath(editor.hwnd);
 	if(!corePath){ 
@@ -218,11 +219,6 @@ getPath = function(hwnd){
 	if(..io.exist(path)){
 		return path;
 	}
-
-	var path = ..io.fullpath("/xray-core/xray.exe");
-	if(..io.exist(path)){
-		..io.rename("/xray-core/","/xray-core/") 
-	}
 	
 	if(self.lastDownloadingCoreFailed){
 		return;
@@ -324,7 +320,7 @@ updateCore = function(){
 socksProxyPort = SOCKS代理端口
 httpProxPort = HTTP代理端口
 isInboundPortChanged() = 是否已变更代理端口配置
-restart(.(editor,outbound) = 重启启动 xray 服务进程
+restart(.(editor,outbound) = 重新启动 xray 服务进程
 lastDownloadingCoreFailed = 上次下载 Core 是否失败,如果希望重新下载请重新赋值为 null
 getPath( = 获取xray core路径，如果没有的话，从网络下载，\n并打印日志到文件句柄指定的界面编辑器
 getPath(.(hwnd) = 编辑器句柄

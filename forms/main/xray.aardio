@@ -32,7 +32,6 @@ import config;
 import xray.core; 
 var currentOutboundIndex,currentOutboundAddress;
 var activeOutbound = function(outboundIndex,outboundAddress,enableRetry,timerTesting){
-	
 	// 如果没有值，则退出
 	if(!outboundIndex && !outboundAddress){
 		outboundIndex,outboundAddress = currentOutboundIndex,currentOutboundAddress;
@@ -53,6 +52,7 @@ var activeOutbound = function(outboundIndex,outboundAddress,enableRetry,timerTes
 		
 		var started,err = xray.core.restart(frmXray.edit,outbound);
 		startTesting = started;
+		
 		if(!started){
 			frmXray.edit.print("启动 Xray 错误",err:""); 
 			frmXray.btnTcping.disabledText = null;

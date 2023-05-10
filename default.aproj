@@ -33,6 +33,5 @@
 	<folder name="xray-core" path="xray-core" comment="xray-core" local="false" embed="false" ignored="false">
 		<file name="LICENSE" path="xray-core\LICENSE" comment="xray-core\LICENSE"/>
 		<file name="WinXray-default-servers.json" path="xray-core\WinXray-default-servers.json" comment="xray-core\WinXray-default-servers.json"/>
-		<file name="xray.exe" path="xray-core\xray.exe" comment="xray-core\xray.exe"/>
 	</folder>
 </project>
