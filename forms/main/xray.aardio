@@ -1111,17 +1111,8 @@ subscribe("uiCommand.restartxrayCore",function(){
 } )
 
 import process;
+// 程序真正入口
 if(#config.proxy.outbounds){
-	config.proxy.outbounds.fields = {"protocol";"address";"port";"security";"network";"ps";}
-	
-	var outbounds = config.proxy.outbounds;
-	for(i=#outbounds;1;-1){
-		if(type(outbounds[i])!="table"){
-			table.remove(outbounds,i);
-		}
-	}
-	frmXray.listview.setTable(outbounds);	
-	
 	frmXray.setTimeout( 
 		function(){
 			publish("uiCommand.restartxrayCore");	
