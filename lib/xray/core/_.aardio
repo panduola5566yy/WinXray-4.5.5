@@ -47,7 +47,6 @@ restart = function(editor,outbound){
 		return null,"错误的入站HTTP代理服务器配置" 
 	}
 
-	// xrayStarting的作用是判断core是否启动，不需要在最后设置为false，否则可以重复启动
 	if(xrayStarting){ return null,"不能重复启动 Xray Core"  } 
 	xrayStarting = true;
 	
@@ -171,6 +170,7 @@ restart = function(editor,outbound){
 	
 	..publish("uiCommand.print","已启动代理服务器，SOCKS端口:" + socksProxyPort + " HTTP端口:" + httpProxPort) 
 	..publish("xrayCore.restarted",socksProxyPort,httpProxPort); 
+	xrayStarting = false;
 	return true;
 }
 
