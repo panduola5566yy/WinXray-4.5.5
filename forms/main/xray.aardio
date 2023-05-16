@@ -46,6 +46,7 @@ var activeOutbound = function(outboundIndex,outboundAddress,enableRetry,timerTes
 		return ; 
 	} 
  	
+ 	// 按 按钮之后，传进来的是空，所以会进入下面的判断
 	var startTesting = timerTesting;
 	if(!startTesting){
 		..publish("activeOutbound",false); 
@@ -256,26 +257,33 @@ frmXray.onStartXrayFailed = function(outboundIndex,enableRetry,outboundAddress){
 	
 }
 
+// 测延迟
 var tcping = function(frmXray,outboundIndex,outbound){ 
 	import wsock.tcp.client; 
 	var timeout = 0; 
 	var failed = 0;
+	// 测试8次，取平均值作为延迟
 	for(i=1;8;1){ 
 		sleep(1);
 		
 		var client = wsock.tcp.client(); 	
 		var tickBegin = time.tick(); 
+		
 		if(client.connectTimeout(outbound.address,tonumber(outbound.port),3)){
+			// 发送成功的话，返回“.”的长度（1）给ret
 			var ret = client.send("."); 
 			client.close();
 			
+			// 没有发送成功
 			if( ret != 1){  
 				frmXray.onTcpingReturn(outboundIndex,outbound.address,false,"不可用");
 				return;
 			}
+			// 累计时间，后面求平均值
 			timeout =  timeout + (time.tick() - tickBegin);
 		}
 		else {
+			// 3秒超时的情况
 			client.close();
 			
 			failed++;
@@ -286,6 +294,8 @@ var tcping = function(frmXray,outboundIndex,outbound){
 		} 
 	}
 	
+	// 调用的是frmXray.btnTcping.oncommand中的onTcpingReturn
+	// 如果后面发现有调用其他地方的onTcpingReturn，则需要将该功能单独抽出来
 	frmXray.onTcpingReturn(outboundIndex,outbound.address,true,math.round(timeout / (8-failed) / 1000,2)+"秒"); 
 };
 
@@ -295,28 +305,34 @@ frmXray.onTcpingFailed = function(){
 	frmXray.btnTcping.disabledText = null;	
 	..publish("activeOutbound",false); 
 	
+	// 如果有值，就清除定时器
 	if(retryOnNetworkAliveTimerId){
 		frmXray.clearTimeout(retryOnNetworkAliveTimerId);
 	}
-		
+	
+	// 不使用代理服务器时，有没有网络
 	if(inet.http.isAlive(,false)){
+		// 有网络时，自动更新订阅
 		frmXray.autoUpdateSubscription(1000);
 	}
 	else {
+		// 没有网时，创建一个定时器，每隔1秒执行一次匿名函数
 		retryOnNetworkAliveTimerId = frmXray.setInterval( 
-			1000,function(){ 
-
+			function(){ 
+				// 如果有激活了的服务器，那么retryOnNetworkAliveTimerId设为空，
+				// 并返回0，表示不再执行定时器函数
 				if(frmXray.listview.activeOutboundIndex){
 					retryOnNetworkAliveTimerId = null;
 					return 0;
 				}
 				
 				if(inet.http.isAlive(,false)){
+					// 检测到有网后，重新测延迟，并清除定时器
 					frmXray.btnTcping.oncommand();
 					retryOnNetworkAliveTimerId = null;
-					return false;
+					return 0;
 				}	
-			} 
+			},1000
 		) 
 	}  
 } 
@@ -334,6 +350,7 @@ frmXray.btnTcping.oncommand = function(id,event){
 		frmXray.btnTcping.disabledText = {'\uF254';'\uF251';'\uF252';'\uF253';'\uF250'}
 		
 		xray.core.lastDownloadingCoreFailed = false;
+		// 如果没有找到 xray core，那么就退出函数
 		if(!xray.core.getPath()){ 
 			frmXray.btnTcping.disabledText = null; 
 			return;
@@ -344,10 +361,12 @@ frmXray.btnTcping.oncommand = function(id,event){
 			if(address!=frmXray.listview.getItemText(outboundIndex,2)){
 				return; 
 			} 
+			// 无论连接是否成功，都要显示延迟时间
 			frmXray.listview.setItemText(speedText,outboundIndex,7);
-			
+
 			if(succeeded){
-				frmXray.listview.setItemText(speedText,outboundIndex,7);
+				// 接收到第一个成功返回的节点后，改写frmXray.onTcpingReturn，使后面的成功节点
+				// 都只是放到frmXray.validOutbounds。之后激活第一个成功节点
 				frmXray.validOutbounds = {}
 				frmXray.onTcpingReturn = function(outboundIndex,address,succeeded,speedText){
 					if(address!=frmXray.listview.getItemText(outboundIndex,2)){
@@ -356,6 +375,7 @@ frmXray.btnTcping.oncommand = function(id,event){
 					
 					frmXray.listview.setItemText(speedText,outboundIndex,7);
 					if(succeeded) { 
+						// 后续成功节点都放到全局变量frmXray.validOutbounds中
 						table.push(frmXray.validOutbounds,{outboundIndex;address});
 					}
 					else{
@@ -365,10 +385,13 @@ frmXray.btnTcping.oncommand = function(id,event){
 						}
 					}
 				}
+				// 激活第一个节点
+				// #items>1 表示节点数大于1时，启动重试。可能需要改成 #validOutbounds>0
 				activeOutbound(outboundIndex,address,#items>1);	
 			}
 			else{
 				failedCount++;
+				// 所有节点都不通时执行
 				if(failedCount==#items) {
 					frmXray.onTcpingFailed(); 
 				}
@@ -381,12 +404,16 @@ frmXray.btnTcping.oncommand = function(id,event){
 		var outbounds = config.proxy.outbounds;
 		var lenPing = 0;
 		var listview = frmXray.listview;
+		
+		// 测速前，初始化显示内容
 		for(i=1;#items;1){
+			// 这个配置都没有
 			if(outbounds[i].autoConnect===false){
 				listview.setItemText("禁止测速",i,7);
 				continue;
 			}
 			
+			// 超过了上限退出循环，不检测
 			if(lenPing>config.proxy.maxTestServers){
 				frmXray.edit.print("测速服务器数超出设定上限:"+config.proxy.maxTestServers + "，您可在「配置 / 高级设置」中修改此值。")
 				break;
@@ -396,11 +423,14 @@ frmXray.btnTcping.oncommand = function(id,event){
 			listview.setItemText("...",i,7);
 			listview.setItemText("",i,8);
 			
-			var h = thread.create(tcping,frmXray,i,config.proxy.outbounds[i]);	 
+			// 创建测速线程
+			var h = thread.create(tcping,frmXray,i,config.proxy.outbounds[i]);
 			table.push(handles,h);
-		} 
+		}
+		// 启动测速
 		thread.createSuspended(false);
 		
+		// 释放资源
 		for(i=1;#handles;1){
 			var h = handles[i];	 
 			thread.resume(h);
@@ -1105,13 +1135,14 @@ subscribe("uiCommand.restartxrayCore",function(){
 			table.remove(outbounds,i);
 		}
 	}
-	frmXray.listview.setTable(outbounds);	 
-	
+	frmXray.listview.setTable(outbounds); 
+	// 程序首次执行时，lastDownloadingCoreFailed没有定义，所以下面一定会执行
 	if(!xray.core.lastDownloadingCoreFailed) frmXray.btnTcping.oncommand();
 } )
 
 import process;
 // 程序真正入口
+// 如果有代理节点
 if(#config.proxy.outbounds){
 	frmXray.setTimeout( 
 		function(){
@@ -1258,6 +1289,10 @@ if(config.proxy.test){
 
 frmXray.chkAutoTest.skin(style.checkBox);
 
-
 frmXray.enableDpiScaling();
 win.loopMessage();
+
+/**intellisense
+tcping( = 代理节点延迟测试
+tcping(.(编辑器 ,代理节点索引 ,代理节点) = 
+end intellisense**/

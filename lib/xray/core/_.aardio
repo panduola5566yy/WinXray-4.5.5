@@ -47,6 +47,7 @@ restart = function(editor,outbound){
 		return null,"错误的入站HTTP代理服务器配置" 
 	}
 
+	// xrayStarting的作用是判断core是否启动，不需要在最后设置为false，否则可以重复启动
 	if(xrayStarting){ return null,"不能重复启动 Xray Core"  } 
 	xrayStarting = true;
 	
@@ -170,7 +171,6 @@ restart = function(editor,outbound){
 	
 	..publish("uiCommand.print","已启动代理服务器，SOCKS端口:" + socksProxyPort + " HTTP端口:" + httpProxPort) 
 	..publish("xrayCore.restarted",socksProxyPort,httpProxPort); 
-	xrayStarting = false;
 	return true;
 }
 
@@ -194,6 +194,7 @@ var getxrayCoreUrl = function(){
 	form.icon = '\uF1D8';
 	form.progress.startProgress(50); 
 	
+	// TODO: 将github地址换成cloudflare CDN
 	var url,tag = ..win.invoke(function(){
     	import process;
 		import inet.http;
@@ -322,7 +323,7 @@ httpProxPort = HTTP代理端口
 isInboundPortChanged() = 是否已变更代理端口配置
 restart(.(editor,outbound) = 重新启动 xray 服务进程
 lastDownloadingCoreFailed = 上次下载 Core 是否失败,如果希望重新下载请重新赋值为 null
-getPath( = 获取xray core路径，如果没有的话，从网络下载，\n并打印日志到文件句柄指定的界面编辑器
+getPath( = 获取xray core路径。如果没有的话，就从网络下载，\n并打印日志到文件句柄指定的界面编辑器
 getPath(.(hwnd) = 编辑器句柄
 getxrayCoreUrl( = 获取xray core最新版下载地址
 isInboundPortChanged() = 判断入站端口是否被修改

@@ -218,6 +218,7 @@ winform.btnTestSpeed.oncommand = function(id,event){
 }
 
 onActiveOutbound = function(address){
+	// 设置测速按钮是否可点击（address传false时不可点击）
 	winform.btnTestSpeed.disabled = !address;
 	if(type.isString(address)){
 		winform.lbCurrentProxyLocation.text = "当前活动的代理服务器：" + address;

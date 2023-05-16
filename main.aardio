@@ -311,6 +311,8 @@ mainForm.wndproc = {
 				import process;
 				process.explore("shell:::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");	
 			});
+/*
+			// 我没有单独要浏览器代理的需求，要代理的话，就整台电脑
 			mainForm.popmenu.add();
 			
 			import chrome.path;
@@ -322,6 +324,7 @@ mainForm.wndproc = {
 						+`" --user-data-dir="` +io.fullpath("/data/chrome-socks5")+ `" https://www.google.com`);
 				});	
 			}
+*/
 			
 			mainForm.popmenu.add();
 			mainForm.popmenu.add('退出',function(id){ 
