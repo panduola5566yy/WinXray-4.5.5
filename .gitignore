@@ -35,13 +35,13 @@ ENV/
 *.sublime-project
 
 # winxray
-WinXray
-config
-xray-core/xray.exe
-xray-core/config.json
-xray-core/*-core
-download
-tmp
-temp
-.build
-data
+/WinXray
+/config
+/xray-core/xray.exe
+/xray-core/config.json
+/xray-core/*-core
+/download
+/tmp
+/temp
+/.build
+/data

@@ -62,7 +62,9 @@ switchHotkey  = function(){
 
 reset = function(proxy){
 	if(proxy===false){
+		// 如果代理模式是pac或者全局
 		if(..config.proxy.mode != "direct"){
+			// 设置网络连接为无代理
 			..inet.conn.setProxy();
 			..xray.github.setProxy(false);
 		}

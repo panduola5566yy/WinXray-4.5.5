@@ -74,10 +74,13 @@ restart = function(editor,outbound){
 	..publish("activeOutbound",false);
 	
 	import sysProxy;
+	// reset，不使用代理
 	..sysProxy.reset(false);
 
 	socksProxyPort = inbounds[1].port;  
 	httpProxPort = inbounds[2].port;
+	// 49152是默认动态端口范围的开始端口，49152-65535
+	// 如果没有设置端口，或者设置端口的是动态端口，那么就使用默认提供的端口
 	if( (! socksProxyPort) || socksProxyPort >=  49152 ){ socksProxyPort = ..wsock.tcp.server.getFreePort("127.0.0.1",1081,10801,10811,44821)  }
 	if( (! httpProxPort) || httpProxPort >=  49152 ){ httpProxPort = ..wsock.tcp.server.getFreePort("127.0.0.1",1082,10802,10812,44822) }
 	
@@ -109,7 +112,7 @@ restart = function(editor,outbound){
 		var nextProxyPort = ..wsock.getFreePort();
 		if(!..xray.core.naive.restart(editor,outbound,nextProxyPort)){
 			xrayStarting = false;
-			return false,"SSR Core 启动失败";
+			return false,"Naive Core 启动失败";
 		}
 
 		outbound = {
@@ -121,8 +124,8 @@ restart = function(editor,outbound){
 		nexCore = ..xray.core.naive;
 	}
 
+	// 启动程序点击按钮的话，prcsxray为空
 	if( ! prcsxray ){ 
-		
 		import xray.core.configJson;
 		var jsonPath,err = ..xray.core.configJson.write(
 			..io.joinpath(..io.splitpath(corePath).dir,"config.json")
