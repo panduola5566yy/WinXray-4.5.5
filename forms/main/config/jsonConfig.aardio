@@ -629,6 +629,7 @@ var editOutboundsTip = {
 	obfsParam = {"混淆参数";"SSR 里的 obfs_param"}; 
 	networkParam = {"SSR网络协议参数";"SSR 里的 protocol_param"}; 
 	concurrency = {"Mux多路复用:最大并发连接数";"最小值1，最大值1024，特殊值-1，不加载mux模块。缺省由WinXray根据连接协议自动设定此值。"}; 
+	subscribeUrl = {"订阅地址";"节点订阅链接"};
 }
 
 winform.editOutbounds.wndproc = function(hwnd,message,wParam,lParam){

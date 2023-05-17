@@ -332,12 +332,14 @@ if(table.getByNamespace("fsys.update.simpleMain")){
 	winform.lnkVersion.skin(style.link)
 	tooltipCtrl.addTool(winform.lnkVersion,"点击检测更新" );
 	winform.lnkVersion.oncommand = function(id,event){ 
-		
+		winform.msgFrown("该功能暂时关闭", 1500)
+/*
 		winform.lnkVersion.text = fsys.update.simpleMain.getReadyStatusInfo() ? "正在启动自动更新" : "正在检查新版本";
 		winform.lnkVersion.disabledText = {'\uF254';'\uF251';'\uF252';'\uF253';'\uF250'}
 		if(fsys.update.simpleMain.checkUpdate(true)){
 			win.quitMessage();
 		}
+*/
 	}
 }
 else {

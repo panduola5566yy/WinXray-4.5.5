@@ -163,9 +163,7 @@ frmXray.onStartXrayComplete = function(outboundIndex,timerTesting,outboundAddres
 	// 停止自动更新
 	frmXray.autoUpdateSubscription(-1);
 	
-	// 经过测试，congif和..config是恒等的，所以下面只取一个就行
-	// var outbound = config.proxy.outbounds[outboundIndex];
-	// var outbound = ..config.proxy.outbounds[outboundIndex];
+	var outbound = config.proxy.outbounds[outboundIndex];
 	var outbound = ..config.proxy.outbounds[outboundIndex];
 
 	// 如果出站代理不存在，或者地址与给定地址不匹配，则退出函数
@@ -196,13 +194,13 @@ frmXray.onStartXrayComplete = function(outboundIndex,timerTesting,outboundAddres
 		listview.setItemText("",outboundIndex,7);
 	}
 	
-	// 设置回调函数，当 TCPing 测试完成后更新 ListView	
+	// 重写回调函数，新的可用节点不再存储到frmXray.validOutbounds中
 	frmXray.onTcpingReturn = function(outboundIndex,address,succeeded,speedText){
 		if(address==listview.getItemText(outboundIndex,2)){
 			listview.setItemText(speedText,outboundIndex,7);
 		}
 	};
-	// 初始化有效出站代理的列表
+	// 清空有效出站代理的列表
 	frmXray.validOutbounds = {};
 	
 	// 恢复 TCPing 按钮
@@ -1168,6 +1166,7 @@ subscribe("sysProxy.modeChanged",function(mode){
 		frmXray.radioProxyDirect.checked = true;
 	}
 } )
+// 设置代理
 publish("sysProxy.modeChanged",config.proxy.mode);
 
 import sysProxy;

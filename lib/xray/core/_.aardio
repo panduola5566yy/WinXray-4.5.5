@@ -30,7 +30,10 @@ isInboundPortChanged = function(){
 	return (inbounds[1].port!=socksProxyPort) || (inbounds[2].port!=httpProxPort)
 }
 
-var prcsxray,xrayStarting;
+// xray进程
+var prcsxray;
+// xray启动中，注意最后需要置为false表示启动结束，否则再次选择节点时会失败
+var xrayStarting;
 import process.job.limitKill;
 // 重启xray
 restart = function(editor,outbound){
@@ -56,8 +59,7 @@ restart = function(editor,outbound){
 		xrayStarting = false;
 		return false,"启动失败,未找到 xray.exe"; 
 	}  
-	
-	// 先不要断开当前代理，使用当前代理下载会更快。
+
 	if( outbound.protocol == "ssr" ){ 
 		if(!..xray.core.ssr.getPath(editor.hwnd)){
 			xrayStarting = false;
@@ -80,10 +82,11 @@ restart = function(editor,outbound){
 	socksProxyPort = inbounds[1].port;  
 	httpProxPort = inbounds[2].port;
 	// 49152是默认动态端口范围的开始端口，49152-65535
-	// 如果没有设置端口，或者设置端口的是动态端口，那么就使用默认提供的端口
+	// 如果没有设置端口，或者设置端口的是动态端口，那么就使用默认提供的端口（下面多个端口表示依次优先获取）
 	if( (! socksProxyPort) || socksProxyPort >=  49152 ){ socksProxyPort = ..wsock.tcp.server.getFreePort("127.0.0.1",1081,10801,10811,44821)  }
 	if( (! httpProxPort) || httpProxPort >=  49152 ){ httpProxPort = ..wsock.tcp.server.getFreePort("127.0.0.1",1082,10802,10812,44822) }
 	
+	// 停止各种core
 	if(prcsxray){
 		prcsxray.terminate();
 		prcsxray = null;
@@ -124,9 +127,10 @@ restart = function(editor,outbound){
 		nexCore = ..xray.core.naive;
 	}
 
-	// 启动程序点击按钮的话，prcsxray为空
+	// 启动程序时点击按钮，prcsxray为空，进入分支
 	if( ! prcsxray ){ 
 		import xray.core.configJson;
+		// 生成代理节点的json配置文件
 		var jsonPath,err = ..xray.core.configJson.write(
 			..io.joinpath(..io.splitpath(corePath).dir,"config.json")
 			,outbound,socksProxyPort,httpProxPort);
