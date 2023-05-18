@@ -7,7 +7,7 @@ btnEditPacOrUwp={cls="plus";text="编辑PAC";left=332;top=367;right=438;bottom=3
 btnImportServerFromClipBd={cls="plus";text="批量导入链接";left=459;top=367;right=592;bottom=397;align="left";db=1;dr=1;font=LOGFONT(h=-13);iconStyle={align="left";font=LOGFONT(h=-13;name='FontAwesome');padding={left=12}};iconText='\uF196 ';notify=1;textPadding={left=30};z=8};
 btnTcping={cls="plus";text="检测并连接最快服务器";left=735;top=366;right=941;bottom=398;align="left";bgcolor=11580047;border={radius=4};db=1;dr=1;font=LOGFONT(h=-13);iconStyle={align="left";font=LOGFONT(h=-13;name='FontAwesome');padding={left=18}};iconText='\uF012';notify=1;textPadding={left=42};z=3};
 chkAutoTest={cls="plus";text="异常自动重连 ";left=599;top=367;right=730;bottom=397;align="left";db=1;dr=1;font=LOGFONT(h=-13);iconStyle={align="left";font=LOGFONT(h=-13;name='FontAwesome');padding={left=12}};iconText='\uF0C8';notify=1;textPadding={left=30};z=9};
-edit={cls="edit";left=6;top=404;right=953;bottom=584;bgcolor=0;color=16777215;db=1;dl=1;dr=1;edge=1;hscroll=1;multiline=1;vscroll=1;z=2};
+edit={cls="edit";left=7;top=404;right=954;bottom=584;bgcolor=0;color=16777215;db=1;dl=1;dr=1;edge=1;multiline=1;vscroll=1;z=2};
 listview={cls="listview";left=4;top=5;right=954;bottom=358;db=1;dl=1;dr=1;dt=1;edge=1;fullRow=1;gridLines=1;z=1};
 radioProxy={cls="radiobutton";text="全局代理";left=133;top=367;right=230;bottom=397;bgcolor=16777215;db=1;dl=1;font=LOGFONT(h=-13);z=4};
 radioProxyDirect={cls="radiobutton";text="不使用代理";left=18;top=367;right=124;bottom=397;bgcolor=16777215;db=1;dl=1;font=LOGFONT(h=-13);z=6};
@@ -1287,6 +1287,18 @@ if(config.proxy.test){
 }
 
 frmXray.chkAutoTest.skin(style.checkBox);
+
+frmXray.edit.enablePopMenu({
+	{ /*---分隔线---*/ };
+	{ "清屏";
+		function(){
+			var text = frmXray.edit.text;
+			if(#text){
+				frmXray.edit.text='';
+			}
+		}
+	}; 
+})
 
 frmXray.enableDpiScaling();
 win.loopMessage();
